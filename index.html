@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>3rd Party Cookies</title>
+    <base href="/" />
+  </head>
+  <body>
+    <script src="https://cdn.auth0.com/js/auth0/9.11/auth0.min.js"></script>
+    <script>
+      var AUTH0_CLIENT_ID = YOUR_AUTH0_CLIENT_ID;
+      var AUTH0_DOMAIN = YOUR_AUTH0_DOMAIN;
+      var AUTH0_CALLBACK_URL = location.href;
+
+      var webAuth = new auth0.WebAuth({
+        domain: AUTH0_DOMAIN,
+        clientID: AUTH0_CLIENT_ID,
+        redirectUri: AUTH0_CALLBACK_URL,
+        responseType: "token id_token",
+        scope: "openid profile email",
+        leeway: 60
+      });
+
+      function login(e) {
+        webAuth.authorize({});
+      }
+
+      function logout() {
+        webAuth.logout({
+          returnTo: location.href,
+          federated: true,
+          clientID: AUTH0_CLIENT_ID
+        });
+      }
+      const handleError = err => {
+        console.log(err);
+        document.getElementById("txtErrMsg").innerHTML =
+          err.error + "\n" + err.errorDescription;
+      };
+
+      function renewToken() {
+        webAuth.checkSession({}, function(err, authResult) {
+          if (authResult && authResult.accessToken && authResult.idToken) {
+            window.location.hash = "";
+            document.getElementById("txtIdToken").innerHTML =
+              authResult.idToken;
+            document.getElementById("txtAccessToken").innerHTML =
+              authResult.accessToken;
+            document.getElementById("txtErrMsg").innerHTML =
+              "Refresh token success.\n";
+          } else if (err) {
+            handleError(err);
+          }
+        });
+      }
+
+      webAuth.parseHash(function(err, authResult) {
+        if (authResult && authResult.accessToken && authResult.idToken) {
+          window.location.hash = "";
+          document.getElementById("txtIdToken").innerHTML = authResult.idToken;
+          document.getElementById("txtAccessToken").innerHTML =
+            authResult.accessToken;
+          document.getElementById("txtErrMsg").innerHTML = "Login success.\n";
+        } else if (err) {
+          handleError(err);
+        }
+      });
+    </script>
+    <div>
+      <h1>3rd Party Cookies Test</h1>
+      <p>
+        <button id="btnLogin" onclick="login()">Log In</button>
+        <button id="btnLogoutAuth0" onclick="logout()">Log Out</button>
+        <button id="btnRenewToken" onclick="renewToken()">Renew Token</button>
+      </p>
+    </div>
+    <hr />
+    <p>Message / Error:</p>
+    <pre id="txtErrMsg"></pre>
+    <div style="display: block;">
+      <p>ID Token</p>
+      <pre
+        id="txtIdToken"
+        style="word-wrap: break-word;word-break: break-all"
+      ></pre>
+    </div>
+    <div style="display: block;">
+      <p>Access Token</p>
+      <pre id="txtAccessToken" style="word-wrap: break-word;"></pre>
+    </div>
+  </body>
+</html>
