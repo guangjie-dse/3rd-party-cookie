@@ -1,5 +1,6 @@
 # miniSPA
 Minimal demo SPA of [auth0.js](https://auth0.com/docs/libraries/auth0js/v9) SDK
+
 Pure html+javascript based
 
 ## How to Setup
